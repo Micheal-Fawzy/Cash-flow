@@ -7,25 +7,33 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="index.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    
     <!-- Add Babel for in-browser JSX/TSX transpilation -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- Configure module imports for React and other dependencies -->
-    <script type="importmap">
+    
+    <!-- Load UMD dependencies to be available as globals -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/recharts/umd/Recharts.min.js"></script>
+
+<script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@18.2.0",
-    "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
-    "react/": "https://esm.sh/react@18.2.0/",
-    "react-dom/": "https://esm.sh/react-dom@18.2.0/",
-    "recharts": "https://esm.sh/recharts@2.12.7",
-    "recharts/": "https://esm.sh/recharts@2.12.7/"
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "recharts": "https://aistudiocdn.com/recharts@^3.3.0"
   }
 }
 </script>
-  </head>
+</head>
   <body class="bg-gray-100 dark:bg-gray-900">
     <div id="root"></div>
-    <!-- Change script type to "text/babel" and add presets for Babel to process TSX correctly -->
-    <script type="text/babel" data-presets="react,typescript" data-type="module" src="index.tsx"></script>
+    <!-- 
+      Change script to transform ES modules to UMD format.
+      This avoids the browser's native module loader which fails on .tsx files 
+      due to incorrect MIME types from the server.
+    -->
+    <script type="text/babel" data-presets="react,typescript" data-plugins="transform-modules-umd" src="index.tsx"></script>
   </body>
 </html>
