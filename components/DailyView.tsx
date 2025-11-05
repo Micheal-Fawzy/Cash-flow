@@ -1,4 +1,3 @@
-
 import React, { useMemo } from 'react';
 import type { Transaction } from '../types';
 import { CASH_INFLOW_CATEGORIES, CASH_OUTFLOW_CATEGORIES } from '../constants';
@@ -17,6 +16,10 @@ const getDaysInMonth = (year: number, month: number) => {
 const formatNumber = (num: number) => {
     if (num === 0) return "-";
     return new Intl.NumberFormat('ar-EG').format(num);
+};
+
+const calculatePeriodTotal = (data: number[], start: number, end: number) => {
+    return data.slice(start, end).reduce((sum, value) => sum + value, 0);
 };
 
 export const DailyView: React.FC<DailyViewProps> = ({ selectedDate, transactions, onTransactionChange }) => {
@@ -54,25 +57,17 @@ export const DailyView: React.FC<DailyViewProps> = ({ selectedDate, transactions
 
   const renderSection = (title: string, categories: string[]) => (
     <>
-      <tr className="bg-teal-100 dark:bg-teal-900/50 sticky top-0 z-[1]">
-        <th className="font-bold text-right p-2 whitespace-nowrap sticky right-0 bg-teal-100 dark:bg-teal-900/50">{title}</th>
-        {days.map(day => (
-          <th key={day} className={`p-2 font-semibold text-center w-28 min-w-[112px]
-            ${day === 10 && 'border-l-2 border-teal-400 dark:border-teal-600'}
-            ${day === 20 && 'border-l-2 border-teal-400 dark:border-teal-600'}
-          `}>{day}</th>
-        ))}
+      <tr className="bg-teal-100 dark:bg-teal-900/50 sticky top-10 z-[2]">
+        <th className="font-bold text-right p-2 whitespace-nowrap sticky right-0 bg-teal-100 dark:bg-teal-900/50 z-[3]">{title}</th>
+        <td colSpan={days.length + 3} className="p-0"></td>
       </tr>
       {categories.map(category => (
         <tr key={category} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800/50">
-          <td className="text-right p-2 pr-4 sticky right-0 bg-white dark:bg-gray-800 whitespace-nowrap">{category}</td>
+          <td className="text-right p-2 pr-4 sticky right-0 bg-white dark:bg-gray-800 whitespace-nowrap z-[3]">{category}</td>
           {days.map(day => {
              const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
              return (
-              <td key={day} className={`p-0 text-center text-sm
-                ${day === 10 && 'border-l-2 border-gray-300 dark:border-gray-600'}
-                ${day === 20 && 'border-l-2 border-gray-300 dark:border-gray-600'}
-              `}>
+              <td key={day} className="p-0 text-center text-sm">
                 <EditableCell
                   value={getTransactionValue(day, category)}
                   onSave={(newValue) => onTransactionChange(dateStr, category, newValue)}
@@ -80,6 +75,10 @@ export const DailyView: React.FC<DailyViewProps> = ({ selectedDate, transactions
               </td>
             )
           })}
+          {/* Summary Cells */}
+          <td className="p-2 text-center text-sm font-semibold bg-teal-100 dark:bg-teal-900/50 border-l-2 border-r-2 border-teal-400 dark:border-teal-500">{formatNumber(calculatePeriodTotal(days.map(d => getTransactionValue(d, category)), 0, 10))}</td>
+          <td className="p-2 text-center text-sm font-semibold bg-teal-100 dark:bg-teal-900/50 border-l-2 border-r-2 border-teal-400 dark:border-teal-500">{formatNumber(calculatePeriodTotal(days.map(d => getTransactionValue(d, category)), 10, 20))}</td>
+          <td className="p-2 text-center text-sm font-semibold bg-teal-100 dark:bg-teal-900/50 border-l-2 border-r-2 border-teal-400 dark:border-teal-500">{formatNumber(calculatePeriodTotal(days.map(d => getTransactionValue(d, category)), 20, daysInMonth))}</td>
         </tr>
       ))}
     </>
@@ -89,40 +88,32 @@ export const DailyView: React.FC<DailyViewProps> = ({ selectedDate, transactions
      <tr className={`
       ${isBold ? 'bg-blue-100 dark:bg-blue-900/50 font-bold' : 'bg-gray-100 dark:bg-gray-800'}
       border-b border-gray-200 dark:border-gray-700`}>
-        <td className={`text-right p-2 pr-4 sticky right-0 whitespace-nowrap ${isBold ? 'bg-blue-100 dark:bg-blue-900/50' : 'bg-gray-100 dark:bg-gray-800'}`}>{title}</td>
+        <td className={`text-right p-2 pr-4 sticky right-0 whitespace-nowrap z-[3] ${isBold ? 'bg-blue-100 dark:bg-blue-900/50' : 'bg-gray-100 dark:bg-gray-800'}`}>{title}</td>
         {data.map((value, index) => (
-          <td key={index} className={`p-2 text-center text-sm
-            ${index + 1 === 10 && 'border-l-2 border-gray-300 dark:border-gray-600'}
-            ${index + 1 === 20 && 'border-l-2 border-gray-300 dark:border-gray-600'}
-            ${isNegativeRed && value < 0 ? 'text-red-500' : ''}`}>
+          <td key={index} className={`p-2 text-center text-sm ${isNegativeRed && value < 0 ? 'text-red-500' : ''}`}>
               {formatNumber(value)}
           </td>
         ))}
+        {/* Summary Cells */}
+        <td className={`p-2 text-center text-sm font-semibold bg-teal-100 dark:bg-teal-900/50 border-l-2 border-r-2 border-teal-400 dark:border-teal-500 ${isNegativeRed && calculatePeriodTotal(data, 0, 10) < 0 ? 'text-red-500' : ''}`}>{formatNumber(calculatePeriodTotal(data, 0, 10))}</td>
+        <td className={`p-2 text-center text-sm font-semibold bg-teal-100 dark:bg-teal-900/50 border-l-2 border-r-2 border-teal-400 dark:border-teal-500 ${isNegativeRed && calculatePeriodTotal(data, 10, 20) < 0 ? 'text-red-500' : ''}`}>{formatNumber(calculatePeriodTotal(data, 10, 20))}</td>
+        <td className={`p-2 text-center text-sm font-semibold bg-teal-100 dark:bg-teal-900/50 border-l-2 border-r-2 border-teal-400 dark:border-teal-500 ${isNegativeRed && calculatePeriodTotal(data, 20, daysInMonth) < 0 ? 'text-red-500' : ''}`}>{formatNumber(calculatePeriodTotal(data, 20, daysInMonth))}</td>
      </tr>
   );
 
   return (
     <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg overflow-x-auto">
-        <div className="w-full border-collapse" style={{ minWidth: '1800px' }}>
-          <table className="w-full">
-            <thead>
+        <table className="w-full border-collapse" style={{ minWidth: `${200 + (daysInMonth * 112) + (3 * 120)}px` }}>
+            <thead className="sticky top-0 z-[4]">
               <tr className="bg-gray-200 dark:bg-gray-700 text-sm">
-                <th className="text-right p-2 sticky right-0 bg-gray-200 dark:bg-gray-700 min-w-[200px]">البند / اليوم</th>
-                {Array.from({length: 10}).map((_, i) => <th key={i} className="p-2 w-28 min-w-[112px]">{i+1}</th>)}
+                <th className="text-right p-2 sticky right-0 bg-gray-200 dark:bg-gray-700 min-w-[200px] z-[5]">البند / اليوم</th>
+                {days.map(day => <th key={day} className="p-2 w-28 min-w-[112px]">{day}</th>)}
+                {/* Summary Headers */}
                 <th className="p-2 bg-teal-600 text-white min-w-[120px] border-l-2 border-r-2 border-teal-400 dark:border-teal-500">Q1</th>
-
-                {Array.from({length: 10}).map((_, i) => <th key={i} className="p-2 w-28 min-w-[112px]">{i+11}</th>)}
                 <th className="p-2 bg-teal-600 text-white min-w-[120px] border-l-2 border-r-2 border-teal-400 dark:border-teal-500">Q2</th>
-
-                {Array.from({length: daysInMonth - 20}).map((_, i) => <th key={i} className="p-2 w-28 min-w-[112px]">{i+21}</th>)}
-                {Array.from({length: 30 - daysInMonth}).map((_, i) => <th key={i} className="p-2 w-28 min-w-[112px] bg-gray-300 dark:bg-gray-600"></th>)}
                 <th className="p-2 bg-teal-600 text-white min-w-[120px] border-l-2 border-r-2 border-teal-400 dark:border-teal-500">Q3</th>
               </tr>
             </thead>
-          </table>
-      </div>
-      <div className="w-full border-collapse overflow-x-auto" style={{ minWidth: '1800px' }}>
-        <table className="w-full">
             <tbody>
               {renderSection('التدفقات النقدية الداخلة', CASH_INFLOW_CATEGORIES)}
               {renderTotalsRow('إجمالي الإيصالات', dailyInflows, true)}
@@ -130,19 +121,19 @@ export const DailyView: React.FC<DailyViewProps> = ({ selectedDate, transactions
               {renderTotalsRow('إجمالي المدفوعات', dailyOutflows, true)}
               {renderTotalsRow('صافي التدفق النقدي', dailyNetFlow, false, true)}
               <tr className="bg-green-100 dark:bg-green-900/50 font-bold border-t-2 border-gray-300 dark:border-gray-600">
-                <td className="text-right p-2 pr-4 sticky right-0 bg-green-100 dark:bg-green-900/50 whitespace-nowrap">الرصيد الختامي / التراكمي</td>
+                <td className="text-right p-2 pr-4 sticky right-0 bg-green-100 dark:bg-green-900/50 whitespace-nowrap z-[3]">الرصيد الختامي / التراكمي</td>
                 {cumulativeBalance.map((value, index) => (
-                    <td key={index} className={`p-2 text-center text-sm
-                    ${index + 1 === 10 && 'border-l-2 border-gray-300 dark:border-gray-600'}
-                    ${index + 1 === 20 && 'border-l-2 border-gray-300 dark:border-gray-600'}
-                    ${value < 0 ? 'text-red-500' : 'text-green-700 dark:text-green-400'}`}>
+                    <td key={index} className={`p-2 text-center text-sm ${value < 0 ? 'text-red-500' : 'text-green-700 dark:text-green-400'}`}>
                     {formatNumber(value)}
                     </td>
                 ))}
+                {/* Summary Cells */}
+                <td className={`p-2 text-center text-sm font-semibold bg-teal-100 dark:bg-teal-900/50 border-l-2 border-r-2 border-teal-400 dark:border-teal-500 ${cumulativeBalance.length > 9 && cumulativeBalance[9] < 0 ? 'text-red-500' : 'text-green-700 dark:text-green-400'}`}>{formatNumber(cumulativeBalance[9])}</td>
+                <td className={`p-2 text-center text-sm font-semibold bg-teal-100 dark:bg-teal-900/50 border-l-2 border-r-2 border-teal-400 dark:border-teal-500 ${cumulativeBalance.length > 19 && cumulativeBalance[19] < 0 ? 'text-red-500' : 'text-green-700 dark:text-green-400'}`}>{formatNumber(cumulativeBalance[19])}</td>
+                <td className={`p-2 text-center text-sm font-semibold bg-teal-100 dark:bg-teal-900/50 border-l-2 border-r-2 border-teal-400 dark:border-teal-500 ${cumulativeBalance.length > 0 && cumulativeBalance[daysInMonth - 1] < 0 ? 'text-red-500' : 'text-green-700 dark:text-green-400'}`}>{formatNumber(cumulativeBalance[daysInMonth - 1])}</td>
               </tr>
             </tbody>
         </table>
-      </div>
     </div>
   );
 };

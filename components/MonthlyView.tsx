@@ -1,4 +1,3 @@
-
 import React, { useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 import type { Transaction } from '../types';
@@ -52,6 +51,8 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({ selectedYear, transact
 
     return data;
   }, [selectedYear, transactions]);
+  
+  const hasData = useMemo(() => monthlyData.some(d => d.totalIncome > 0 || d.totalExpenses > 0), [monthlyData]);
 
   const totals = useMemo(() => {
     return monthlyData.reduce(
@@ -106,30 +107,39 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({ selectedYear, transact
       <div className="lg:col-span-3 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
         <h2 className="text-xl font-bold mb-4 text-teal-600 dark:text-teal-400">ملخص مرئي حسب الشهر</h2>
         <div className="w-full h-96">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={monthlyData} margin={{ top: 20, right: 20, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(128, 128, 128, 0.2)" />
-              <XAxis dataKey="month" tick={{ fill: '#9CA3AF' }} />
-              <YAxis tickFormatter={formatCurrency} tick={{ fill: '#9CA3AF' }} />
-              <Tooltip
-                contentStyle={{ 
-                  backgroundColor: 'rgba(31, 41, 55, 0.8)', 
-                  borderColor: '#4B5563',
-                  borderRadius: '0.5rem',
-                  color: '#F9FAFB'
-                }}
-                formatter={(value: number) => formatNumber(value)}
-              />
-              <Legend />
-              <Bar dataKey="netCashFlow" name="صافي التدفق النقدي" fill="#8884d8">
-                {monthlyData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.netCashFlow >= 0 ? '#10B981' : '#EF4444'} />
-                ))}
-              </Bar>
-              <Bar dataKey="totalIncome" name="إجمالي الدخل" stackId="a" fill="#34D399" />
-              <Bar dataKey="totalExpenses" name="إجمالي المصروفات" stackId="a" fill="#F87171" />
-            </BarChart>
-          </ResponsiveContainer>
+            {hasData ? (
+                <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={monthlyData} margin={{ top: 20, right: 20, left: 20, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(128, 128, 128, 0.2)" />
+                    <XAxis dataKey="month" tick={{ fill: '#9CA3AF' }} />
+                    <YAxis tickFormatter={formatCurrency} tick={{ fill: '#9CA3AF' }} />
+                    <Tooltip
+                        contentStyle={{ 
+                        backgroundColor: 'rgba(31, 41, 55, 0.8)', 
+                        borderColor: '#4B5563',
+                        borderRadius: '0.5rem',
+                        color: '#F9FAFB'
+                        }}
+                        formatter={(value: number, name: string) => {
+                            if (name === 'صافي التدفق النقدي') {
+                                return [formatNumber(value), 'صافي التدفق'];
+                            }
+                            return [formatNumber(value), name];
+                        }}
+                    />
+                    <Legend />
+                    <Bar dataKey="netCashFlow" name="صافي التدفق النقدي" fill="#8884d8">
+                        {monthlyData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.netCashFlow >= 0 ? '#10B981' : '#EF4444'} />
+                        ))}
+                    </Bar>
+                    </BarChart>
+                </ResponsiveContainer>
+             ) : (
+                <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
+                    لا توجد بيانات لعرضها لهذا العام.
+                </div>
+            )}
         </div>
       </div>
     </div>
