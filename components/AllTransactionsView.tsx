@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import type { Transaction } from '../types';
-import { CASH_INFLOW_CATEGORIES } from '../constants';
+import type { Transaction } from '../types.ts';
+import { CASH_INFLOW_CATEGORIES } from '../constants.ts';
 
 interface AllTransactionsViewProps {
   transactions: Transaction[];

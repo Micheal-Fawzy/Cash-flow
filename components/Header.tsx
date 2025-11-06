@@ -1,6 +1,6 @@
 import React from 'react';
-import type { View } from '../App';
-import { MONTHS } from '../constants';
+import type { View } from '../App.tsx';
+import { MONTHS } from '../constants.ts';
 
 interface HeaderProps {
   currentView: View;

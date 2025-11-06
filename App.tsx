@@ -1,10 +1,10 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { DailyView } from './components/DailyView';
-import { MonthlyView } from './components/MonthlyView';
-import { AllTransactionsView } from './components/AllTransactionsView';
-import { Header } from './components/Header';
-import { Transaction } from './types';
-import { generateInitialData } from './constants';
+import { DailyView } from './components/DailyView.tsx';
+import { MonthlyView } from './components/MonthlyView.tsx';
+import { AllTransactionsView } from './components/AllTransactionsView.tsx';
+import { Header } from './components/Header.tsx';
+import { Transaction } from './types.ts';
+import { generateInitialData } from './constants.ts';
 
 export type View = 'daily' | 'monthly' | 'all';
 

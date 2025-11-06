@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
-import type { Transaction } from '../types';
-import { CASH_INFLOW_CATEGORIES, CASH_OUTFLOW_CATEGORIES } from '../constants';
-import { EditableCell } from './EditableCell';
+import type { Transaction } from '../types.ts';
+import { CASH_INFLOW_CATEGORIES, CASH_OUTFLOW_CATEGORIES } from '../constants.ts';
+import { EditableCell } from './EditableCell.tsx';
 
 interface DailyViewProps {
   selectedDate: Date;

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
-import type { Transaction } from '../types';
-import { MONTHS, CASH_INFLOW_CATEGORIES } from '../constants';
+import type { Transaction } from '../types.ts';
+import { MONTHS, CASH_INFLOW_CATEGORIES } from '../constants.ts';
 
 interface MonthlyViewProps {
   selectedYear: number;

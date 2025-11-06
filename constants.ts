@@ -1,5 +1,4 @@
-
-import { Transaction } from './types';
+import { Transaction } from './types.ts';
 
 export const MONTHS = [
   'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
